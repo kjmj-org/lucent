@@ -24,9 +24,6 @@ jobs:
           - os: macos-14 # Apple Silicon (arm64)
             script: build:mac
             pattern: 'dist/*.dmg'
-          - os: macos-13 # Intel (x64)
-            script: build:mac
-            pattern: 'dist/*.dmg'
           - os: ubuntu-latest
             script: build:linux
             pattern: 'dist/*.AppImage'
