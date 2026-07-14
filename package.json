@@ -1,0 +1,45 @@
+{
+  "name": "lucent",
+  "productName": "Lucent",
+  "version": "0.1.0",
+  "description": "Lucent — prepare Amazon listing and A+ images before you upload. Diagnose image-quality problems, get a preparation score, and export a marketplace-ready version. Local-first and open source.",
+  "author": "Lucent Contributors",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:all": "electron-builder -mwl"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.lucent.imageprep",
+    "productName": "Lucent",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "assets/**/*",
+      "!**/*.md"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "asarUnpack": [
+      "**/node_modules/sharp/**",
+      "**/node_modules/@img/**"
+    ]
+  }
+}

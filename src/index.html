@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>Lucent</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1>Lucent</h1>
+        <p data-i18n="app.tagline"></p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-add" class="btn" data-i18n="btn.add"></button>
+      <button id="btn-clear" class="btn ghost" data-i18n="btn.clearAll"></button>
+      <div class="lang-switch">
+        <button data-lang="en" class="lang active">EN</button>
+        <button data-lang="zh" class="lang">中文</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Image list -->
+    <aside class="col list-col">
+      <div id="image-list" class="image-list"></div>
+      <div id="list-empty" class="list-empty" data-i18n="list.empty"></div>
+      <button id="btn-export-all" class="btn primary block" data-i18n="btn.exportAll" disabled></button>
+    </aside>
+
+    <!-- Preview -->
+    <section class="col preview-col">
+      <div id="dropzone" class="dropzone">
+        <div class="dz-inner">
+          <span class="dz-icon" aria-hidden="true"></span>
+          <h2 data-i18n="drop.title"></h2>
+          <p data-i18n="drop.subtitle"></p>
+          <p class="privacy" data-i18n="drop.privacy"></p>
+        </div>
+      </div>
+
+      <div id="preview-wrap" class="preview-wrap hidden">
+        <div class="preview-tabs">
+          <button class="ptab active" data-mode="slider" data-i18n="preview.slider"></button>
+          <button class="ptab" data-mode="side" data-i18n="preview.side"></button>
+          <button class="ptab" data-mode="sim" data-i18n="preview.sim"></button>
+          <button class="ptab" data-mode="mobile" data-i18n="preview.mobile"></button>
+          <div class="spacer"></div>
+          <button class="ptab zoom" data-zoom="fit" data-i18n="zoom.fit"></button>
+          <button class="ptab zoom" data-zoom="100" data-i18n="zoom.100"></button>
+        </div>
+
+        <div id="stage" class="stage">
+          <!-- slider view -->
+          <div id="view-slider" class="view slider-view">
+            <div class="slider-frame" id="slider-frame">
+              <!-- The original image defines the frame's size. -->
+              <img id="slider-original" class="slider-base" alt="original" />
+              <!-- The optimized is revealed by the clip; clip-inner is pinned to
+                   the frame width so the image never resizes as we slide. -->
+              <div class="slider-clip" id="slider-clip">
+                <div class="clip-inner" id="clip-inner">
+                  <img id="slider-optimized" class="slider-front" alt="optimized" />
+                </div>
+              </div>
+              <div class="slider-handle" id="slider-handle"><span></span></div>
+              <div class="tag tag-left" data-i18n="preview.optimized"></div>
+              <div class="tag tag-right" data-i18n="preview.original"></div>
+            </div>
+          </div>
+          <!-- side by side -->
+          <div id="view-side" class="view side-view hidden">
+            <figure><img id="side-original" alt="original" /><figcaption data-i18n="preview.original"></figcaption></figure>
+            <figure><img id="side-optimized" alt="optimized" /><figcaption data-i18n="preview.optimized"></figcaption></figure>
+          </div>
+          <!-- simulation -->
+          <div id="view-sim" class="view sim-view hidden">
+            <figure><img id="sim-optimized" alt="optimized" /><figcaption data-i18n="preview.optimized"></figcaption></figure>
+            <figure><img id="sim-image" alt="estimated" /><figcaption data-i18n="preview.sim"></figcaption></figure>
+          </div>
+          <!-- mobile device mockup -->
+          <div id="view-mobile" class="view mobile-view hidden">
+            <div class="phone">
+              <div class="phone-screen">
+                <div class="phone-island"></div>
+                <div class="m-statusbar">
+                  <span class="m-time">9:41</span>
+                  <span class="m-status-right"><i class="m-signal"></i><i class="m-wifi"></i><i class="m-batt"></i></span>
+                </div>
+                <div class="m-imgwrap"><img id="mobile-img" alt="on mobile" /></div>
+                <div class="m-skel">
+                  <div class="m-line w90"></div>
+                  <div class="m-line w60"></div>
+                  <div class="m-price"></div>
+                  <div class="m-rating"></div>
+                  <div class="m-btn"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mobile-note hidden" data-i18n="preview.mobileNote"></p>
+
+        <p class="sim-note" data-i18n="preview.simNote"></p>
+        <div id="preview-loading" class="preview-loading hidden" data-i18n="preview.compute"></div>
+      </div>
+
+      <div id="preview-empty" class="preview-empty" data-i18n="preview.empty"></div>
+    </section>
+
+    <!-- Controls + score -->
+    <aside class="col control-col">
+      <div class="card">
+        <label class="field-label" data-i18n="panel.preset"></label>
+        <select id="preset-select" class="select"></select>
+        <div class="dim-row">
+          <input id="dim-w" class="dim-input" type="number" min="1" />
+          <span class="dim-x">×</span>
+          <input id="dim-h" class="dim-input" type="number" min="1" />
+          <span class="dim-unit">px</span>
+        </div>
+        <p id="preset-note" class="preset-note"></p>
+        <p class="preset-warn" data-i18n="panel.presetNote"></p>
+      </div>
+
+      <div class="card">
+        <label class="field-label" data-i18n="panel.level"></label>
+        <div id="level-group" class="seg">
+          <button class="seg-btn" data-level="conservative" data-i18n="level.conservative"></button>
+          <button class="seg-btn active" data-level="balanced" data-i18n="level.balanced"></button>
+          <button class="seg-btn" data-level="strong" data-i18n="level.strong"></button>
+        </div>
+
+        <label class="field-label" data-i18n="panel.fit"></label>
+        <select id="fit-select" class="select">
+          <option value="fit" data-i18n="panel.fit.fit"></option>
+          <option value="fill" data-i18n="panel.fit.fill"></option>
+          <option value="stretch" data-i18n="panel.fit.stretch"></option>
+        </select>
+
+        <label class="field-label" data-i18n="panel.format"></label>
+        <select id="format-select" class="select">
+          <option value="auto" data-i18n="panel.format.auto"></option>
+          <option value="jpeg" data-i18n="panel.format.jpeg"></option>
+          <option value="png" data-i18n="panel.format.png"></option>
+        </select>
+
+        <label class="check">
+          <input type="checkbox" id="apply-all" />
+          <span data-i18n="batch.applyAll"></span>
+        </label>
+      </div>
+
+      <div class="card score-card">
+        <div class="score-head">
+          <span class="field-label" data-i18n="score.title"></span>
+          <span id="score-scope" class="score-scope"></span>
+        </div>
+        <div class="score-ring-wrap">
+          <div id="score-ring" class="score-ring">
+            <span id="score-value">—</span>
+          </div>
+        </div>
+        <div id="score-delta" class="score-delta hidden"></div>
+        <p class="score-estimate" data-i18n="score.estimate"></p>
+        <div id="category-list" class="category-list"></div>
+      </div>
+
+      <div class="card issues-card">
+        <span class="field-label" data-i18n="issues.title"></span>
+        <div id="issues-list" class="issues-list"></div>
+      </div>
+
+      <div class="action-area">
+        <button id="btn-apply" class="btn primary block" data-i18n="btn.apply" disabled></button>
+        <button id="btn-export" class="btn primary block hidden" data-i18n="btn.exportOptimized"></button>
+        <button id="btn-revert" class="btn ghost block small hidden" data-i18n="btn.revert"></button>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="i18n.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
