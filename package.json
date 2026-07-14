@@ -16,6 +16,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "build:win": "electron-builder --win --publish never",
+    "build:mac": "electron-builder --mac --publish never",
+    "build:linux": "electron-builder --linux --publish never",
     "dist": "electron-builder --win",
     "dist:all": "electron-builder -mwl"
   },
@@ -27,8 +30,9 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.lucent.imageprep",
+    "appId": "org.kjmj.lucent",
     "productName": "Lucent",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
     "files": [
       "main.js",
       "preload.js",
@@ -39,11 +43,27 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.graphics-design",
+      "identity": null
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "assets/icon.png",
+      "category": "Graphics"
     },
     "asarUnpack": [
       "**/node_modules/sharp/**",

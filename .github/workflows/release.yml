@@ -1,0 +1,65 @@
+name: Release
+
+# Cut a release by pushing a version tag, e.g.:  git tag v0.1.0 && git push origin v0.1.0
+# Or run manually from the Actions tab (build-only, no release) via workflow_dispatch.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    strategy:
+      fail-fast: false # one platform failing shouldn't block the others
+      matrix:
+        include:
+          - os: windows-latest
+            script: build:win
+            pattern: 'dist/*.exe'
+          - os: macos-14 # Apple Silicon (arm64)
+            script: build:mac
+            pattern: 'dist/*.dmg'
+          - os: macos-13 # Intel (x64)
+            script: build:mac
+            pattern: 'dist/*.dmg'
+          - os: ubuntu-latest
+            script: build:linux
+            pattern: 'dist/*.AppImage'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run ${{ matrix.script }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lucent-${{ matrix.os }}
+          path: ${{ matrix.pattern }}
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    if: always() && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
+          fail_on_unmatched_files: false
