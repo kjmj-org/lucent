@@ -5,6 +5,14 @@
   "description": "Lucent — prepare Amazon listing and A+ images before you upload. Diagnose image-quality problems, get a preparation score, and export a marketplace-ready version. Local-first and open source.",
   "author": "Lucent Contributors",
   "license": "MIT",
+  "homepage": "https://kjmj.org/app/lucent",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kjmj-org/lucent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kjmj-org/lucent/issues"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",
